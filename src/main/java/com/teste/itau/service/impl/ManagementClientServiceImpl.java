@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Log4j2
 @Service
 public class ManagementClientServiceImpl implements ManagementClientService {
@@ -21,10 +24,7 @@ public class ManagementClientServiceImpl implements ManagementClientService {
     public void cadastrarCliente(ManagementClientRequestDTO request) {
         log.info("Request Cliente {}", request);
         if(validarNumeroConta(request.getNumeroConta())){
-            Client clientPersist = new Client();
-            clientPersist.setNome(request.getNome());
-            clientPersist.setNumeroConta(request.getNumeroConta());
-            clientPersist.setSaldo(request.getSaldo());
+            Client clientPersist = criarCliente(request);
             try {
                 clientRepository.save(clientPersist);
             }catch (DataAccessException e){
@@ -35,6 +35,25 @@ public class ManagementClientServiceImpl implements ManagementClientService {
             log.error("Número da conta já existe!");
             throw new ContaExistenteException("Número da conta já existe!");
         }
+    }
+
+    private Client criarCliente(ManagementClientRequestDTO request) {
+        Client clientPersist = new Client();
+        clientPersist.setNome(request.getNome());
+        clientPersist.setNumeroConta(request.getNumeroConta());
+        clientPersist.setSaldo(request.getSaldo());
+        return clientPersist;
+    }
+
+    @Override
+    public List<ManagementClientRequestDTO> listarClientes() {
+        List<Client> clientList = clientRepository.findAll();
+        List<ManagementClientRequestDTO> listaClienteDTO = new ArrayList<>();
+        clientList.forEach(client -> {
+            ManagementClientRequestDTO clientRequestDTO = new ManagementClientRequestDTO(client.getNome(),client.getNumeroConta(),client.getSaldo());
+            listaClienteDTO.add(clientRequestDTO);
+        });
+        return listaClienteDTO;
     }
 
     private boolean validarNumeroConta(String numeroConta) {

@@ -1,5 +1,6 @@
 package com.teste.itau.exception;
 
+import com.teste.itau.dto.ErrorApiResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -8,33 +9,40 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @ControllerAdvice
 public class ManagementExceptionHandler {
 
     @ExceptionHandler(ContaExistenteException.class)
     @ResponseBody
-    public ResponseEntity<Map<String, String>> handleContaExistenteException(ContaExistenteException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("mensagem", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<ErrorApiResponseDTO> handleContaExistenteException(ContaExistenteException ex) {
+        List<Map<String, String>> listMap = new ArrayList<>();
+        ErrorApiResponseDTO errors = new ErrorApiResponseDTO();
+        Map<String, String> mapErros = new HashMap<>();
+        mapErros.put("erro",ex.getMessage());
+        listMap.add(mapErros);
+        errors.setMensagem(listMap);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ExceptionHandler(BDException.class)
     @ResponseBody
     public ResponseEntity<Map<String, String>> handleContaExistenteException(BDException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put("mensagem", ex.getMessage());
+        response.put("erro", ex.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ErrorApiResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> listMap = new ArrayList<>();
+        ErrorApiResponseDTO errors = new ErrorApiResponseDTO();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put("mensagem", error.getDefaultMessage());
+            Map<String, String> mapErros = new HashMap<>();
+            mapErros.put("erro",error.getDefaultMessage());
+            listMap.add(mapErros);
+            errors.setMensagem(listMap);
         }
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }

@@ -1,5 +1,6 @@
 package com.teste.itau.controller;
 
+import com.teste.itau.dto.ErrorApiResponseDTO;
 import com.teste.itau.dto.ManagementClientRequestDTO;
 import com.teste.itau.service.ManagementClientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,12 +12,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,7 +35,9 @@ public class ManagementClientController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Requisição inválida",
-                    content = @Content)
+                    content = {@Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorApiResponseDTO.class))
+                    })
     })
     @PostMapping("/cadastrar-cliente")
     public ResponseEntity<Map<String, String>> cadastrarCliente(@Valid @RequestBody ManagementClientRequestDTO requestBody) {
@@ -46,5 +47,15 @@ public class ManagementClientController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @Operation(summary = "Lista todos os clientes", description = "Retorna todos os clientes cadastrados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Clientes listados com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ManagementClientRequestDTO.class))})
+    })
+    @GetMapping("/listar-clientes")
+    public ResponseEntity<List<ManagementClientRequestDTO>> listarClientes() {
+        List<ManagementClientRequestDTO> listaDeClientes = managementClientService.listarClientes();
+        return new ResponseEntity<>(listaDeClientes, HttpStatus.OK);
     }
 }
