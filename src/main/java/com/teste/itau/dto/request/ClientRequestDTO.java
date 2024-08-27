@@ -1,4 +1,4 @@
-package com.teste.itau.dto;
+package com.teste.itau.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ManagementClientRequestDTO {
+public class ClientRequestDTO {
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
 

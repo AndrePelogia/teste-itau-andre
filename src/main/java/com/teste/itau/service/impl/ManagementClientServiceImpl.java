@@ -1,6 +1,6 @@
 package com.teste.itau.service.impl;
 
-import com.teste.itau.dto.ManagementClientRequestDTO;
+import com.teste.itau.dto.request.ClientRequestDTO;
 import com.teste.itau.exception.BDException;
 import com.teste.itau.exception.ContaExistenteException;
 import com.teste.itau.model.Client;
@@ -20,8 +20,8 @@ public class ManagementClientServiceImpl implements ManagementClientService {
 
     @Autowired
     private ManagementClientRepository clientRepository;
-    @Override
-    public void cadastrarCliente(ManagementClientRequestDTO request) {
+
+    public void cadastrarCliente(ClientRequestDTO request) {
         log.info("Request Cliente {}", request);
         if(validarNumeroConta(request.getNumeroConta())){
             Client clientPersist = criarCliente(request);
@@ -37,7 +37,7 @@ public class ManagementClientServiceImpl implements ManagementClientService {
         }
     }
 
-    private Client criarCliente(ManagementClientRequestDTO request) {
+    private Client criarCliente(ClientRequestDTO request) {
         Client clientPersist = new Client();
         clientPersist.setNome(request.getNome());
         clientPersist.setNumeroConta(request.getNumeroConta());
@@ -45,18 +45,29 @@ public class ManagementClientServiceImpl implements ManagementClientService {
         return clientPersist;
     }
 
-    @Override
-    public List<ManagementClientRequestDTO> listarClientes() {
+
+    public List<ClientRequestDTO> listarClientes() {
         List<Client> clientList = clientRepository.findAll();
-        List<ManagementClientRequestDTO> listaClienteDTO = new ArrayList<>();
+        List<ClientRequestDTO> listaClienteDTO = new ArrayList<>();
         clientList.forEach(client -> {
-            ManagementClientRequestDTO clientRequestDTO = new ManagementClientRequestDTO(client.getNome(),client.getNumeroConta(),client.getSaldo());
+            ClientRequestDTO clientRequestDTO = new ClientRequestDTO(client.getNome(),client.getNumeroConta(),client.getSaldo());
             listaClienteDTO.add(clientRequestDTO);
         });
         return listaClienteDTO;
     }
 
+    public ClientRequestDTO buscarClientePorNumeroConta(String numeroConta) {
+        Client cliente = clientRepository.findByNumeroConta(numeroConta).orElseThrow(()-> new ContaExistenteException("Conta não encontrada!"));
+        return converterParaDTO(cliente);
+    }
+
+
     private boolean validarNumeroConta(String numeroConta) {
         return !clientRepository.existsByNumeroConta(numeroConta);
+    }
+
+    private ClientRequestDTO converterParaDTO(Client client) {
+        ClientRequestDTO dto = new ClientRequestDTO(client.getNome(),client.getNumeroConta(),client.getSaldo());
+        return dto;
     }
 }

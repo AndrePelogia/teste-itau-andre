@@ -1,12 +1,14 @@
 package com.teste.itau.service;
 
-import com.teste.itau.dto.ManagementClientRequestDTO;
+import com.teste.itau.dto.request.ClientRequestDTO;
 
 import java.util.List;
 
 public interface ManagementClientService {
 
-    void cadastrarCliente(ManagementClientRequestDTO request);
+    void cadastrarCliente(ClientRequestDTO request);
 
-    List<ManagementClientRequestDTO> listarClientes();
+    List<ClientRequestDTO> listarClientes();
+
+    ClientRequestDTO buscarClientePorNumeroConta(String numeroConta);
 }

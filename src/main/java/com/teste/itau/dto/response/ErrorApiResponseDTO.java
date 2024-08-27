@@ -1,4 +1,4 @@
-package com.teste.itau.dto;
+package com.teste.itau.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

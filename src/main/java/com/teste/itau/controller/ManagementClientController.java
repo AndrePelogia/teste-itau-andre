@@ -1,7 +1,7 @@
 package com.teste.itau.controller;
 
-import com.teste.itau.dto.ErrorApiResponseDTO;
-import com.teste.itau.dto.ManagementClientRequestDTO;
+import com.teste.itau.dto.response.ErrorApiResponseDTO;
+import com.teste.itau.dto.request.ClientRequestDTO;
 import com.teste.itau.service.ManagementClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,7 +30,7 @@ public class ManagementClientController {
                     responseCode = "201",
                     description = "Cliente cadastrado com sucesso",
                     content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ManagementClientRequestDTO.class))
+                    schema = @Schema(implementation = ClientRequestDTO.class))
             }),
             @ApiResponse(
                     responseCode = "400",
@@ -40,7 +40,7 @@ public class ManagementClientController {
                     })
     })
     @PostMapping("/cadastrar-cliente")
-    public ResponseEntity<Map<String, String>> cadastrarCliente(@Valid @RequestBody ManagementClientRequestDTO requestBody) {
+    public ResponseEntity<Map<String, String>> cadastrarCliente(@Valid @RequestBody ClientRequestDTO requestBody) {
         managementClientService.cadastrarCliente(requestBody);
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Conta criada com sucesso!");
@@ -51,11 +51,26 @@ public class ManagementClientController {
 
     @Operation(summary = "Lista todos os clientes", description = "Retorna todos os clientes cadastrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Clientes listados com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ManagementClientRequestDTO.class))})
+            @ApiResponse(responseCode = "200", description = "Clientes listados com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ClientRequestDTO.class))})
     })
     @GetMapping("/listar-clientes")
-    public ResponseEntity<List<ManagementClientRequestDTO>> listarClientes() {
-        List<ManagementClientRequestDTO> listaDeClientes = managementClientService.listarClientes();
+    public ResponseEntity<List<ClientRequestDTO>> listarClientes() {
+        List<ClientRequestDTO> listaDeClientes = managementClientService.listarClientes();
         return new ResponseEntity<>(listaDeClientes, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Busca cliente por número da conta", description = "Busca um cliente pelo número de conta.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente encontrado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ClientRequestDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
+    })
+    @GetMapping("buscar-cliente/{numeroConta}")
+    public ResponseEntity<ClientRequestDTO> buscarClientePorNumeroConta(@PathVariable String numeroConta) {
+        ClientRequestDTO cliente = managementClientService.buscarClientePorNumeroConta(numeroConta);
+        if (cliente != null) {
+            return new ResponseEntity<>(cliente, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
