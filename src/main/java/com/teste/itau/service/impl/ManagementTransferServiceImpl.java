@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.teste.itau.mapper.TransferMapper.transferDtoToEntity;
+import static com.teste.itau.mapper.TransferMapper.transferEntityToDto;
 
 @Log4j2
 @Service
@@ -32,7 +33,7 @@ public class ManagementTransferServiceImpl implements ManagementTransferService 
     private ManagementTransferRepository transferRepository;
 
     @Transactional
-    public void realizarTransferencia(TransferRequestDTO request) {
+    public TransferResponseDTO realizarTransferencia(TransferRequestDTO request) {
         log.info("Request Transfer {}", request);
         Client clienteContaOrigem = clientRepository.findByNumeroConta(request.getContaOrigem())
                 .orElseThrow(() -> new CustomApiException("Conta origem não encontrada!"));
@@ -41,8 +42,8 @@ public class ManagementTransferServiceImpl implements ManagementTransferService 
         Transfer transfer = transferDtoToEntity(request);
         try {
             validarTransferencia(request,clienteContaOrigem, transfer);
-            efetivarTransferencia(clienteContaOrigem, clienteContaDestino,transfer, request.getValor());
             log.info("Tranferência salva com sucesso!");
+            return efetivarTransferencia(clienteContaOrigem, clienteContaDestino, transfer, request.getValor());
         } catch (DataAccessException e) {
             log.error("Erro ao tentar realizar transferência!", e);
             throw new CustomApiException("Erro ao tentar realizar a transferência.");
@@ -64,13 +65,13 @@ public class ManagementTransferServiceImpl implements ManagementTransferService 
         }
     }
 
-    private void efetivarTransferencia(Client clienteContaOrigem, Client clienteContaDestino, Transfer transfer, Double valor) {
+    private TransferResponseDTO efetivarTransferencia(Client clienteContaOrigem, Client clienteContaDestino, Transfer transfer, Double valor) {
         clienteContaOrigem.setSaldo(clienteContaOrigem.getSaldo() - valor);
         clienteContaDestino.setSaldo(clienteContaDestino.getSaldo() + valor);
         clientRepository.save(clienteContaOrigem);
         clientRepository.save(clienteContaDestino);
         transfer.setSucesso(true);
-        transferRepository.save(transfer);
+        return transferEntityToDto(transferRepository.save(transfer));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

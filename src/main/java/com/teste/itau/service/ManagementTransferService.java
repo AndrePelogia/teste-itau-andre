@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ManagementTransferService {
 
-    void realizarTransferencia(TransferRequestDTO request);
+    TransferResponseDTO realizarTransferencia(TransferRequestDTO request);
 
     List<TransferResponseDTO> listarTransferenciasPorConta(String numeroConta);
 

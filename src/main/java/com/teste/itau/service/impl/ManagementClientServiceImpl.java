@@ -55,7 +55,7 @@ public class ManagementClientServiceImpl implements ManagementClientService {
                     .collect(Collectors.toList());
         }catch (DataAccessException e){
             log.error("Erro ao tentar buscar clientes",e);
-            throw new BDException("Erro ao tentar buscar clientes", e);
+            throw new BDException("Erro ao tentar buscar clientes",e);
         }
     }
 

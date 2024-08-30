@@ -22,7 +22,7 @@ public class TransferMapper {
         response.setNumeroContaOrigem(transfer.getNumeroContaOrigem());
         response.setNumeroContaDestino(transfer.getNumeroContaDestino());
         response.setValor(transfer.getValor());
-        response.setSucesso(transfer.getSucesso());
+        response.setSucesso(transfer.getSucesso() ? "Transferência realizada!" : "Transferência não realizada!");
         response.setDataTransferencia(transfer.getDataTransferencia());
         return response;
     }

@@ -11,6 +11,6 @@ public class TransferResponseDTO {
     private String numeroContaOrigem;
     private String numeroContaDestino;
     private Double valor;
-    private Boolean sucesso;
+    private String sucesso;
     private LocalDateTime dataTransferencia;
 }

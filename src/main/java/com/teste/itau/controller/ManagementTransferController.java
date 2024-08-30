@@ -32,9 +32,9 @@ public class ManagementTransferController
             @ApiResponse(responseCode = "500", description = "Erro no servidor ao processar a transferência")
     })
     @PostMapping("/realizar-transferencia")
-    public ResponseEntity<String> realizarTransferencia(@RequestBody TransferRequestDTO request) {
-        transferService.realizarTransferencia(request);
-        return new ResponseEntity<>("Transferência realizada com sucesso!", HttpStatus.OK);
+    public ResponseEntity<TransferResponseDTO> realizarTransferencia(@RequestBody TransferRequestDTO request) {
+        TransferResponseDTO transferResponseDTO = transferService.realizarTransferencia(request);
+        return new ResponseEntity<>(transferResponseDTO, HttpStatus.OK);
     }
 
     @Operation(summary = "Lista todas as transações de uma conta", description = "Retorna todos os registros de transferência de um número de conta.")
