@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,4 +22,5 @@ public class Client {
     private String numeroConta;
 
     private Double saldo;
+
 }

@@ -1,5 +1,7 @@
 package com.teste.itau.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.teste.itau.dto.response.ClientResponseDTO;
 import com.teste.itau.dto.response.ErrorApiResponseDTO;
 import com.teste.itau.dto.request.ClientRequestDTO;
 import com.teste.itau.service.ManagementClientService;
@@ -30,7 +32,7 @@ public class ManagementClientController {
                     responseCode = "201",
                     description = "Cliente cadastrado com sucesso",
                     content = {@Content(mediaType = "application/json",
-                    schema = @Schema(implementation = ClientRequestDTO.class))
+                    schema = @Schema(implementation = ClientResponseDTO.class))
             }),
             @ApiResponse(
                     responseCode = "400",
@@ -40,37 +42,31 @@ public class ManagementClientController {
                     })
     })
     @PostMapping("/cadastrar-cliente")
-    public ResponseEntity<Map<String, String>> cadastrarCliente(@Valid @RequestBody ClientRequestDTO requestBody) {
-        managementClientService.cadastrarCliente(requestBody);
-        Map<String, String> response = new HashMap<>();
-        response.put("mensagem", "Conta criada com sucesso!");
+    public ResponseEntity<ClientResponseDTO> cadastrarCliente(@Valid @RequestBody ClientRequestDTO requestBody){
+        ClientResponseDTO clientResponseDTO = managementClientService.cadastrarCliente(requestBody);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(clientResponseDTO);
     }
 
     @Operation(summary = "Lista todos os clientes", description = "Retorna todos os clientes cadastrados.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Clientes listados com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ClientRequestDTO.class))})
+            @ApiResponse(responseCode = "200", description = "Clientes listados com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorApiResponseDTO.class))})
     })
     @GetMapping("/listar-clientes")
-    public ResponseEntity<List<ClientRequestDTO>> listarClientes() {
-        List<ClientRequestDTO> listaDeClientes = managementClientService.listarClientes();
-        return new ResponseEntity<>(listaDeClientes, HttpStatus.OK);
+    public ResponseEntity<List<ClientResponseDTO>> listarClientes() {
+        return new ResponseEntity<>(managementClientService.listarClientes(), HttpStatus.OK);
     }
 
     @Operation(summary = "Busca cliente por número da conta", description = "Busca um cliente pelo número de conta.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cliente encontrado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ClientRequestDTO.class))}),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Cliente encontrado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorApiResponseDTO.class))})
     })
     @GetMapping("buscar-cliente/{numeroConta}")
-    public ResponseEntity<ClientRequestDTO> buscarClientePorNumeroConta(@PathVariable String numeroConta) {
-        ClientRequestDTO cliente = managementClientService.buscarClientePorNumeroConta(numeroConta);
-        if (cliente != null) {
-            return new ResponseEntity<>(cliente, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<ClientResponseDTO> buscarClientePorNumeroConta(@PathVariable String numeroConta) {
+        ClientResponseDTO cliente = managementClientService.buscarClientePorNumeroConta(numeroConta);
+        return new ResponseEntity<>(cliente, HttpStatus.OK);
     }
 }

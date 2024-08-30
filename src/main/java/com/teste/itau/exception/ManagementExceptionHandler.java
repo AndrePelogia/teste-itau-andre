@@ -14,16 +14,22 @@ import java.util.*;
 @ControllerAdvice
 public class ManagementExceptionHandler {
 
-    @ExceptionHandler(ContaExistenteException.class)
+    @ExceptionHandler(CustomApiException.class)
     @ResponseBody
-    public ResponseEntity<ErrorApiResponseDTO> handleContaExistenteException(ContaExistenteException ex) {
+    public ResponseEntity<ErrorApiResponseDTO> handleContaExistenteException(CustomApiException ex) {
         List<Map<String, String>> listMap = new ArrayList<>();
         ErrorApiResponseDTO errors = new ErrorApiResponseDTO();
-        Map<String, String> mapErros = new HashMap<>();
-        mapErros.put("erro",ex.getMessage());
-        listMap.add(mapErros);
-        errors.setMensagem(listMap);
+        errors.setMensagem(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorApiResponseDTO> handleContaExistenteException(NotFoundException ex) {
+        List<Map<String, String>> listMap = new ArrayList<>();
+        ErrorApiResponseDTO errors = new ErrorApiResponseDTO();
+        errors.setMensagem(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
     @ExceptionHandler(BDException.class)
@@ -36,14 +42,8 @@ public class ManagementExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorApiResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        List<Map<String, String>> listMap = new ArrayList<>();
         ErrorApiResponseDTO errors = new ErrorApiResponseDTO();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            Map<String, String> mapErros = new HashMap<>();
-            mapErros.put("erro",error.getDefaultMessage());
-            listMap.add(mapErros);
-            errors.setMensagem(listMap);
-        }
+        errors.setMensagem(ex.getMessage());
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

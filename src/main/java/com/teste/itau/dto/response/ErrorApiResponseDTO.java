@@ -12,6 +12,6 @@ import java.util.Map;
 public class
 ErrorApiResponseDTO {
 
-    @JsonProperty("erros")
-    private List<Map<String, String>> mensagem;
+    @JsonProperty("erro")
+    private String mensagem;
 }
